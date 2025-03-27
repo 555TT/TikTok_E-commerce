@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: @application.name@
+  config:
+    import: classpath:base.yml,classpath:rpc.yml,classpath:cache.yml,classpath:stream.yml
+  cloud:
+    function:
+      definition: newBuy
+    stream:
+      rocketmq:
+        bindings:
+          newBuy-out-0:
+            producer:
+              producerType: Trans
+              transactionListener: inventoryDecreaseTransactionListener
+      bindings:
+        newBuy-out-0:
+          content-type: application/json
+          destination: new-buy-topic
+          group: trade-group
+          binder: rocketmq
+        orderClose-in-0:
+          content-type: application/json
+          destination: order-close-topic
+          group: order-group
+          binder: rocketmq
+
+server:
+  port: 8084
+
+#dubbo:
+#  # 关闭启动时检查
+#  consumer:
+#    check: false
+#  application:
+#    name: nft-turbo-trade
